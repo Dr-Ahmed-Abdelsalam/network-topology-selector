@@ -71,7 +71,96 @@ Every result can be shared as a link, downloaded as a JSON report, or printed / 
 
 ## Architecture
 
-No backend, no build step, no dependencies. Plain HTML, CSS and JavaScript modules, served by GitHub Pages.
+No backend, no build step, no dependencies: plain HTML, CSS and JavaScript modules served by GitHub Pages.
+
+### Components
+
+```mermaid
+flowchart TB
+    subgraph DATA["1 · Data"]
+        direction LR
+        TJ[("topologies.json<br/>criteria · rubric · scores<br/>justifications · references")]
+        RJ[("rules.json<br/>questions · weight rules<br/>scenario thresholds")]
+    end
+
+    DJ["data.js<br/>load + integrity checks"]
+    APP["app.js<br/>wires data, engine and views"]
+
+    subgraph ENGINE["2 · Decision engine · pure modules, covered by 36 tests"]
+        direction LR
+        RQ["requirements.js<br/>answers to weights"] --> SC["scoring.js<br/>weighted sum · ranking"] --> SE["sensitivity.js<br/>robustness checks"]
+        SN["scenario.js<br/>eligibility · hybrid design"]
+        ST["state.js<br/>shareable URL"]
+    end
+
+    subgraph HELP["3 · Interface helpers"]
+        direction LR
+        UIJ["ui.js<br/>rendering"]
+        DG["diagrams.js<br/>SVG topologies"]
+        IN["intro.js<br/>animated intro"]
+    end
+
+    subgraph VIEWS["4 · Views · index.html + style.css"]
+        direction LR
+        V1["Compare<br/>learning mode"]
+        V2["Choose a network<br/>decision mode"]
+        V3["Method & sources"]
+    end
+
+    TESTS["tests/engine.test.mjs"]
+
+    DATA --> DJ --> APP
+    APP --> ENGINE
+    APP --> HELP
+    APP --> VIEWS
+    TESTS -.-> ENGINE
+
+    classDef data fill:#EEF4F7,stroke:#0E9AA7,color:#0F2A3D
+    classDef core fill:#0F2A3D,stroke:#0F2A3D,color:#FFFFFF
+    classDef mod fill:#FFFFFF,stroke:#6F8796,color:#1E2B36
+    classDef test fill:#FFF4E0,stroke:#F2A541,color:#1E2B36
+    class TJ,RJ data
+    class DJ,APP core
+    class RQ,SC,SE,SN,ST,UIJ,DG,IN,V1,V2,V3 mod
+    class TESTS test
+    style DATA fill:#F6F9FB,stroke:#D5E0E7
+    style ENGINE fill:#F6F9FB,stroke:#0E9AA7
+    style HELP fill:#F6F9FB,stroke:#D5E0E7
+    style VIEWS fill:#F6F9FB,stroke:#D5E0E7
+```
+
+### How a recommendation is made
+
+```mermaid
+flowchart TD
+    A["User answers 10 questions<br/>devices, organization, budget, reliability,<br/>traffic, delay, security, growth, redundancy, area"] --> B{"Valid input?"}
+    B -- No --> A
+    B -- Yes --> C["Weights 0-5<br/>start at 3, adjusted by documented rules"]
+    C --> D["Weighted Sum Model<br/>S(t) = Σ w(c)·s(t,c) / Σ w(c)"]
+    F[("Baseline scores 1-10<br/>fixed, same for everyone")] --> D
+    D --> E["Ranking of all 7 topologies"]
+    E --> G["Scenario checks<br/>legacy, full-mesh size, redundancy"]
+    G --> H{"Large, multi-site or<br/>critical network?"}
+    H -- Yes --> I["Hybrid architecture<br/>star access + mesh or tree core"]
+    H -- No --> J["Best eligible topology"]
+    I --> K["Sensitivity analysis<br/>how stable is the result?"]
+    J --> K
+    K --> L["Explained result<br/>reasons, strengths and weaknesses,<br/>assumptions, sources, warnings"]
+    L --> M["Share link · JSON report · Print / PDF"]
+    L -. "user adjusts weights" .-> C
+
+    classDef step fill:#FFFFFF,stroke:#6F8796,color:#1E2B36
+    classDef key fill:#0F2A3D,stroke:#0F2A3D,color:#FFFFFF
+    classDef fixed fill:#EEF4F7,stroke:#0E9AA7,color:#0F2A3D
+    classDef out fill:#FFF4E0,stroke:#F2A541,color:#1E2B36
+    class A,C,E,G,I,J,K step
+    class D,L key
+    class F fixed
+    class M out
+```
+
+<details>
+<summary>File structure</summary>
 
 ```
 index.html               page shell: header, three views, intro dialog
@@ -91,6 +180,8 @@ data/topologies.json     criteria + rubric, topologies, scores, justifications, 
 data/rules.json          questions, answer-to-weight rules, scenario thresholds
 tests/engine.test.mjs    automated tests (Node built-in test runner)
 ```
+
+</details>
 
 ## Run locally
 
