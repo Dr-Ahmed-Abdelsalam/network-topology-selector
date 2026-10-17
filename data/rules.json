@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 2,
+  "about": "Transparent rules that turn plain-language requirements into criterion weights (0-5) and scenario checks. Every weight starts at baseWeight; each answer adds the listed deltas; results are clamped to 0-5. Scenario checks never change baseline scores: they only mark options as not recommended and add notes.",
+  "baseWeight": 3,
+  "questions": [
+    {
+      "id": "devices", "type": "number", "label": "How many devices will connect?",
+      "help": "Computers, phones, printers, servers, cameras and other wired endpoints.",
+      "min": 2, "max": 100000, "required": true
+    },
+    {
+      "id": "org", "type": "choice", "label": "What kind of organization is it?",
+      "options": [
+        { "value": "home", "label": "Home or very small office", "deltas": { "cost": 1, "complexity": 1 } },
+        { "value": "small_business", "label": "Small business", "deltas": { "cost": 1, "complexity": 1 } },
+        { "value": "education", "label": "School or university", "deltas": { "cost": 1, "architecture": 1 } },
+        { "value": "enterprise", "label": "Medium or large company", "deltas": { "architecture": 1, "reliability": 1 } },
+        { "value": "critical", "label": "Bank, hospital or government", "deltas": { "security": 1, "reliability": 1 } },
+        { "value": "industrial", "label": "Factory or industrial control", "deltas": { "delay": 1, "reliability": 1 } },
+        { "value": "data_center", "label": "Data center or service provider", "deltas": { "delay": 1, "congestion": 1, "reliability": 1 } }
+      ]
+    },
+    {
+      "id": "budget", "type": "choice", "label": "What is the budget?",
+      "help": "A category is enough. You can note an amount below for your own report; it is not used in the calculation.",
+      "options": [
+        { "value": "limited", "label": "Tight: lowest cost matters most", "deltas": { "cost": 2, "complexity": 1 } },
+        { "value": "moderate", "label": "Moderate", "deltas": {} },
+        { "value": "generous", "label": "Generous: performance first", "deltas": { "cost": -2 } }
+      ]
+    },
+    {
+      "id": "reliability", "type": "choice", "label": "How bad is a network outage?",
+      "options": [
+        { "value": "standard", "label": "Inconvenient, can wait for repair", "deltas": {} },
+        { "value": "high", "label": "Costly, should be rare", "deltas": { "reliability": 1 } },
+        { "value": "mission_critical", "label": "Unacceptable, must keep running", "deltas": { "reliability": 2, "routing": 1 } }
+      ]
+    },
+    {
+      "id": "traffic", "type": "choice", "label": "How much traffic do you expect?",
+      "options": [
+        { "value": "light", "label": "Light: email, browsing", "deltas": { "congestion": -1 } },
+        { "value": "moderate", "label": "Moderate: file sharing, video calls", "deltas": {} },
+        { "value": "heavy", "label": "Heavy: large transfers, many servers", "deltas": { "congestion": 2, "delay": 1 } }
+      ]
+    },
+    {
+      "id": "latency", "type": "choice", "label": "How sensitive are you to delay?",
+      "options": [
+        { "value": "tolerant", "label": "Tolerant: a short wait is fine", "deltas": {} },
+        { "value": "sensitive", "label": "Sensitive: voice, video, trading", "deltas": { "delay": 1 } },
+        { "value": "real_time", "label": "Real-time: control systems, machines", "deltas": { "delay": 2, "congestion": 1 } }
+      ]
+    },
+    {
+      "id": "security", "type": "choice", "label": "What level of security is required?",
+      "options": [
+        { "value": "basic", "label": "Basic", "deltas": {} },
+        { "value": "elevated", "label": "Elevated: confidential business data", "deltas": { "security": 1 } },
+        { "value": "regulated", "label": "Regulated: financial, medical or government data", "deltas": { "security": 2 } }
+      ]
+    },
+    {
+      "id": "growth", "type": "choice", "label": "How much will the network grow?",
+      "options": [
+        { "value": "stable", "label": "Little or no growth", "deltas": { "architecture": -1 } },
+        { "value": "moderate", "label": "Steady growth", "deltas": { "architecture": 1 } },
+        { "value": "rapid", "label": "Rapid growth", "deltas": { "architecture": 2 } }
+      ]
+    },
+    {
+      "id": "redundancy", "type": "choice", "label": "Can you install backup links and spare equipment?",
+      "help": "Mesh designs are only more reliable when the extra links and devices actually exist.",
+      "options": [
+        { "value": "yes", "label": "Yes", "deltas": {} },
+        { "value": "no", "label": "No", "deltas": {} }
+      ]
+    },
+    {
+      "id": "scope", "type": "choice", "label": "How large is the physical area?",
+      "options": [
+        { "value": "room", "label": "One room or floor", "deltas": {} },
+        { "value": "building", "label": "One building", "deltas": {} },
+        { "value": "campus", "label": "Several buildings (campus)", "deltas": { "architecture": 1, "routing": 1 } },
+        { "value": "distributed", "label": "Several cities or sites", "deltas": { "architecture": 1, "routing": 1 } }
+      ]
+    }
+  ],
+  "scenario": {
+    "fullMeshMaxNodes": 8,
+    "hybridMinDevices": 50,
+    "hybridOrgs": ["enterprise", "data_center", "critical"],
+    "hybridScopes": ["campus", "distributed"],
+    "lowConfidenceUnknowns": 3,
+    "nearTie": 0.3
+  }
+}

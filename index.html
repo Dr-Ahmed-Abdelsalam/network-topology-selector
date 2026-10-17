@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NetTopoRank · Network Topology Comparison and Selection</title>
+  <meta name="description" content="Compare seven network topologies across eight criteria, then describe your network and get an explained, sensitivity-tested recommendation.">
+  <link rel="stylesheet" href="assets/style.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='6' r='4' fill='%23F2A541'/%3E%3Ccircle cx='6' cy='24' r='4' fill='%230E9AA7'/%3E%3Ccircle cx='26' cy='24' r='4' fill='%230E9AA7'/%3E%3Cpath d='M16 6L6 24L26 24Z' fill='none' stroke='%230F2A3D' stroke-width='2'/%3E%3C/svg%3E">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="top">
+    <div class="wrap top-inner">
+      <a class="brand" href="#mode=compare" aria-label="NetTopoRank home">
+        <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 6L6 24L26 24Z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="16" cy="6" r="4" fill="#F2A541"/><circle cx="6" cy="24" r="4" fill="#0E9AA7"/><circle cx="26" cy="24" r="4" fill="#0E9AA7"/></svg>
+        <span><strong>NetTopoRank</strong><small>Network topology comparison &amp; selection</small></span>
+      </a>
+      <nav class="modes" aria-label="Modes">
+        <a href="#mode=compare" data-mode="compare">Compare</a>
+        <a href="#mode=choose" data-mode="choose">Choose a network</a>
+        <a href="#mode=method" data-mode="method">Method &amp; sources</a>
+        <button type="button" class="how" id="replayIntro">How it works</button>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main" class="wrap" tabindex="-1">
+    <!-- ================= COMPARE (learning mode) ================= -->
+    <section id="view-compare" class="view" aria-labelledby="h-compare">
+      <div class="intro-block">
+        <p class="eyebrow">Learning mode</p>
+        <h1 id="h-compare">Seven topologies, eight criteria</h1>
+        <p class="lede">How the classic network topologies differ, how they are scored, and what the scores rest on.</p>
+      </div>
+
+      <div class="primer" id="primer"></div>
+
+      <section class="panel" aria-labelledby="h-cards">
+        <h2 id="h-cards">The topologies</h2>
+        <p class="hint">Badges show what kind of design each one is. Select a card for its full score justification.</p>
+        <div class="cards" id="cards"></div>
+      </section>
+
+      <section class="panel" aria-labelledby="h-matrix">
+        <div class="panel-head">
+          <h2 id="h-matrix">Baseline scoring matrix</h2>
+          <span class="tag">Author's assessment · same for every user</span>
+        </div>
+        <p class="hint">1–10, where 10 is always most favourable (Delay 10 = lowest delay, Complexity 10 = simplest, Cost 10 = cheapest). Hover or tap a cell for the reason.</p>
+        <div class="table-scroll"><table class="matrix" id="matrix"></table></div>
+      </section>
+
+      <section class="panel" aria-labelledby="h-detail" id="detailPanel">
+        <h2 id="h-detail">Score justification</h2>
+        <div class="tabs" id="tabs" role="tablist" aria-label="Topologies"></div>
+        <div class="detail" id="detail" role="tabpanel" tabindex="0"></div>
+      </section>
+
+      <section class="panel" aria-labelledby="h-explore">
+        <div class="panel-head">
+          <h2 id="h-explore">Explore with your own weights</h2>
+          <button class="ghost" id="reset" type="button">Reset to equal</button>
+        </div>
+        <p class="hint">For study: weight the criteria directly and watch the ranking change. For a recommendation from real requirements, use <a href="#mode=choose">Choose a network</a>.</p>
+        <div class="presets" id="presets" role="group" aria-label="Weight presets"></div>
+        <div class="weights" id="exploreWeights"></div>
+        <ol class="ranking" id="exploreRanking"></ol>
+      </section>
+    </section>
+
+    <!-- ================= CHOOSE (decision mode) ================= -->
+    <section id="view-choose" class="view" aria-labelledby="h-choose" hidden>
+      <div class="intro-block">
+        <p class="eyebrow">Decision mode</p>
+        <h1 id="h-choose">Choose the right network</h1>
+        <p class="lede">Describe your situation in plain terms. The tool turns your answers into priorities, ranks the options, and explains the result.</p>
+      </div>
+
+      <form class="panel form" id="reqForm" novalidate>
+        <div class="form-grid" id="formFields"></div>
+        <details class="budget-note">
+          <summary>Add a budget figure to your report (optional)</summary>
+          <div class="field inline">
+            <label for="budgetAmount">Amount and currency</label>
+            <input id="budgetAmount" name="budgetAmount" type="text" maxlength="40" placeholder="e.g. 250,000 EGP" autocomplete="off">
+            <p class="help">Shown in your report only. The calculation uses the budget category above.</p>
+          </div>
+        </details>
+        <div class="form-actions">
+          <button type="submit" class="primary">Get recommendation</button>
+          <button type="button" class="ghost" id="exampleBtn">Fill an example</button>
+          <p class="form-error" id="formError" role="alert"></p>
+        </div>
+      </form>
+
+      <div id="results" hidden>
+        <p class="disclaimer" role="note"><strong>Educational guidance, not an engineering-validated design.</strong> Confirm any real design with a site survey, traffic measurements and vendor specifications.</p>
+
+        <section class="panel rec" aria-labelledby="h-rec" id="recPanel"></section>
+
+        <div class="grid-2">
+          <section class="panel" aria-labelledby="h-why">
+            <h2 id="h-why">Why this result</h2>
+            <div id="whyBody"></div>
+          </section>
+          <section class="panel" aria-labelledby="h-sens">
+            <h2 id="h-sens">How robust is it?</h2>
+            <div id="sensBody"></div>
+          </section>
+        </div>
+
+        <section class="panel" aria-labelledby="h-rank">
+          <h2 id="h-rank">All seven options</h2>
+          <p class="hint">Weighted score from the baseline matrix and your priorities. Options marked "not recommended" stay visible for comparison.</p>
+          <ol class="ranking" id="decideRanking"></ol>
+        </section>
+
+        <section class="panel" aria-labelledby="h-weights">
+          <div class="panel-head">
+            <h2 id="h-weights">Your priorities</h2>
+            <button class="ghost" id="restoreWeights" type="button">Restore from answers</button>
+          </div>
+          <p class="hint">Generated from your answers; adjust any slider and everything above updates. Each weight shows what moved it.</p>
+          <div class="weights" id="decideWeights"></div>
+        </section>
+
+        <div class="grid-2">
+          <section class="panel" aria-labelledby="h-assume">
+            <h2 id="h-assume">Assumptions</h2>
+            <ul class="plain" id="assumeList"></ul>
+          </section>
+          <section class="panel" aria-labelledby="h-refs-used">
+            <h2 id="h-refs-used">Sources behind this result</h2>
+            <ul class="plain refs-mini" id="refsUsed"></ul>
+          </section>
+        </div>
+
+        <div class="export">
+          <button type="button" class="ghost" id="copyLink">Copy link</button>
+          <button type="button" class="ghost" id="downloadJson">Download report (JSON)</button>
+          <button type="button" class="ghost" id="printReport">Print / save as PDF</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= METHOD ================= -->
+    <section id="view-method" class="view" aria-labelledby="h-method" hidden>
+      <div class="intro-block">
+        <p class="eyebrow">Method &amp; sources</p>
+        <h1 id="h-method">How the numbers are made</h1>
+        <p class="lede">Three layers: fixed baseline scores, weights from your priorities, and explicit scenario checks.</p>
+      </div>
+
+      <section class="panel" aria-labelledby="h-wsm">
+        <h2 id="h-wsm">Weighted Sum Model</h2>
+        <p class="formula">S(t) = Σ w(c) · s(t,c) ⁄ Σ w(c)</p>
+        <ul class="plain">
+          <li><strong>s(t,c)</strong>: baseline score of topology t on criterion c, 1–10. Fixed and identical for every user.</li>
+          <li><strong>w(c)</strong>: weight 0–5. In Decision mode each weight starts at 3 and moves by the documented amount for each answer; you can then adjust it.</li>
+          <li><strong>Scenario checks</strong> never change scores. They mark options as not recommended (legacy technology, impractical size, missing redundancy) and add hybrid designs.</li>
+          <li><strong>Sensitivity</strong>: each weight is moved ±1, and 500 seeded random variations of ±25 % test how often the recommendation holds.</li>
+        </ul>
+      </section>
+
+      <section class="panel" aria-labelledby="h-rubric">
+        <h2 id="h-rubric">Scoring rubric</h2>
+        <div class="table-scroll"><table class="rubric" id="rubric"></table></div>
+      </section>
+
+      <section class="panel" aria-labelledby="h-rules">
+        <h2 id="h-rules">From answers to weights</h2>
+        <p class="hint">Every rule, as stored in <code>data/rules.json</code>.</p>
+        <div class="table-scroll"><table class="rules" id="rulesTable"></table></div>
+      </section>
+
+      <section class="panel" aria-labelledby="h-limits">
+        <h2 id="h-limits">Limitations</h2>
+        <ul class="plain" id="limits"></ul>
+      </section>
+
+      <section class="panel" aria-labelledby="h-refs">
+        <h2 id="h-refs">References</h2>
+        <p class="hint">Status shows what was checked on the given date. Page numbers are listed only where they were verified.</p>
+        <ol class="refs" id="refs"></ol>
+      </section>
+    </section>
+  </main>
+
+  <footer class="wrap foot">
+    <p>© 2026 Dr. Ahmed Abdelsalam</p>
+    <p><a href="https://github.com/Dr-Ahmed-Abdelsalam/network-topology-selector">Source on GitHub</a> · MIT License</p>
+  </footer>
+
+  <!-- ================= INTRO ================= -->
+  <div class="intro" id="intro" role="dialog" aria-modal="true" aria-labelledby="introTitle" hidden>
+    <div class="intro-card">
+      <div class="intro-top">
+        <span class="eyebrow" id="introStep">1 / 4</span>
+        <button type="button" class="link" id="introSkip">Skip</button>
+      </div>
+      <div class="intro-stage" id="introStage" aria-live="polite"></div>
+      <div class="intro-nav">
+        <button type="button" class="ghost" id="introPrev">Back</button>
+        <div class="dots" id="introDots" aria-hidden="true"></div>
+        <button type="button" class="primary" id="introNext">Next</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <noscript><p class="wrap">This tool needs JavaScript.</p></noscript>
+  <script type="module" src="assets/js/app.js"></script>
+</body>
+</html>

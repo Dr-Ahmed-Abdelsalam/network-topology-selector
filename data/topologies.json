@@ -1,0 +1,794 @@
+{
+  "schemaVersion": 2,
+  "updated": "2026-10-18",
+  "scale": {
+    "min": 1,
+    "max": 10,
+    "note": "10 is always the most favourable outcome (Delay 10 = lowest delay, Complexity 10 = simplest, Cost 10 = cheapest).",
+    "basis": "Baseline scores are the author's analytical assessment, derived from qualitative characteristics in the references. They are not measured or published numerical values."
+  },
+  "criteria": [
+    {
+      "id": "architecture",
+      "name": "Architecture / Organization",
+      "best": "Clear structure, scalability, ease of expansion",
+      "rubric": {
+        "1": "Rigid; growth requires redesign",
+        "5": "Workable but expansion disrupts service or adds hops",
+        "10": "Clear, modular structure that grows without redesign"
+      }
+    },
+    {
+      "id": "delay",
+      "name": "Delay / Response time",
+      "best": "Lowest and most predictable latency",
+      "rubric": {
+        "1": "Long or unpredictable waits that grow with load or size",
+        "5": "Acceptable at light load; degrades with size or contention",
+        "10": "Minimal hops and bounded, predictable latency"
+      }
+    },
+    {
+      "id": "complexity",
+      "name": "Complexity",
+      "best": "Simplest to design, install and manage",
+      "rubric": {
+        "1": "Many links/ports per node; hard to install and troubleshoot",
+        "5": "Moderate configuration and maintenance effort",
+        "10": "Minimal equipment and configuration"
+      }
+    },
+    {
+      "id": "security",
+      "name": "Security",
+      "best": "Least exposure of traffic to other nodes",
+      "rubric": {
+        "1": "Shared medium: every node can observe all traffic",
+        "5": "Traffic transits other stations or shared segments",
+        "10": "Dedicated links; traffic never transits third parties"
+      }
+    },
+    {
+      "id": "congestion",
+      "name": "Congestion control",
+      "best": "Least contention, best behaviour under load",
+      "rubric": {
+        "1": "Contention and collisions rise sharply with load",
+        "5": "Orderly access but shared capacity or a bottleneck",
+        "10": "No shared links or contention-free access"
+      }
+    },
+    {
+      "id": "routing",
+      "name": "Routing methodology",
+      "best": "Most efficient and flexible path selection",
+      "rubric": {
+        "1": "No path choice (broadcast)",
+        "5": "Single fixed path",
+        "10": "Direct path plus alternatives on failure"
+      }
+    },
+    {
+      "id": "reliability",
+      "name": "Reliability",
+      "best": "Highest fault tolerance, no single point of failure",
+      "rubric": {
+        "1": "One failure stops the whole network",
+        "5": "Failures isolated in places, but a single point of failure remains",
+        "10": "No single point of failure; traffic reroutes"
+      }
+    },
+    {
+      "id": "cost",
+      "name": "Cost",
+      "best": "Cheapest in cabling, devices and maintenance",
+      "rubric": {
+        "1": "Highest cabling, port and maintenance cost",
+        "5": "Moderate cabling plus some active devices",
+        "10": "Least cabling and no central device"
+      }
+    }
+  ],
+  "topologies": [
+    {
+      "id": "bus",
+      "name": "Bus",
+      "category": "physical",
+      "status": "legacy",
+      "aka": "Linear bus",
+      "how": "All stations attach by taps to one shared cable terminated at both ends. Only one station can transmit at a time; classic Ethernet used CSMA/CD to share the medium.",
+      "today": "Historic coaxial Ethernet (10BASE5, 10BASE2). Not a modern LAN procurement option; the shared-medium idea survives in some industrial field buses.",
+      "limits": "Every frame reaches every station, a cable fault stops the whole segment, and collisions grow with the number of stations.",
+      "description": "All stations tap into one shared backbone cable terminated at both ends; access by CSMA/CD.",
+      "refs": [
+        1,
+        4,
+        6
+      ],
+      "baselineScores": [
+        5,
+        5,
+        9,
+        3,
+        3,
+        4,
+        3,
+        9
+      ],
+      "justification": [
+        {
+          "text": "Single shared backbone; passive taps; terminators at both ends",
+          "refs": [
+            1,
+            6
+          ]
+        },
+        {
+          "text": "Fine at light load; degrades as collisions grow with more nodes",
+          "refs": [
+            1,
+            6
+          ]
+        },
+        {
+          "text": "Simplest topology to install; minimal hardware required",
+          "refs": [
+            1,
+            6
+          ]
+        },
+        {
+          "text": "Broadcast medium: every station can see every frame",
+          "refs": [
+            1
+          ]
+        },
+        {
+          "text": "Contention-based CSMA/CD; collisions rise sharply under load",
+          "refs": [
+            2
+          ]
+        },
+        {
+          "text": "No routing: frames are broadcast and filtered by address",
+          "refs": [
+            1
+          ]
+        },
+        {
+          "text": "A backbone cut or terminator fault takes the whole network down",
+          "refs": [
+            1,
+            6
+          ]
+        },
+        {
+          "text": "Least cable of all topologies and no central device",
+          "refs": [
+            1,
+            6
+          ]
+        }
+      ]
+    },
+    {
+      "id": "star",
+      "name": "Star",
+      "category": "physical",
+      "status": "current",
+      "aka": "Hub-and-spoke",
+      "how": "Every station has its own link to a central device. With a switch, frames are forwarded only to the destination port; with a legacy hub they are repeated to all ports.",
+      "today": "The standard layout of wired Ethernet access networks in offices, homes and campuses.",
+      "limits": "The central device is a single point of failure unless it is duplicated. Scores assume a switch, not a hub.",
+      "description": "Each station has a dedicated link to a central switch or hub; the dominant LAN design today.",
+      "refs": [
+        1,
+        4,
+        6
+      ],
+      "baselineScores": [
+        8,
+        8,
+        8,
+        7,
+        7,
+        7,
+        6,
+        7
+      ],
+      "justification": [
+        {
+          "text": "Dedicated point-to-point link from each node to a central switch",
+          "refs": [
+            1,
+            6
+          ]
+        },
+        {
+          "text": "At most two hops; a switch forwards frames in parallel",
+          "refs": [
+            1
+          ]
+        },
+        {
+          "text": "Easy to install, extend and troubleshoot node by node",
+          "refs": [
+            1,
+            6
+          ]
+        },
+        {
+          "text": "Central point for access control, port security and monitoring",
+          "refs": []
+        },
+        {
+          "text": "Switch buffers traffic and isolates collision domains",
+          "refs": [
+            2
+          ]
+        },
+        {
+          "text": "Central switch forwards by MAC table over a single path",
+          "refs": [
+            2
+          ]
+        },
+        {
+          "text": "Link faults stay isolated, but the hub is a single point of failure",
+          "refs": [
+            1,
+            6
+          ]
+        },
+        {
+          "text": "More cable than bus plus the cost of the central device",
+          "refs": [
+            1,
+            6
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ring",
+      "name": "Ring",
+      "category": "physical",
+      "status": "niche",
+      "aka": "Loop",
+      "how": "Each station connects to two neighbours, forming a closed loop. Frames are repeated from station to station in one direction (dual rings can use both).",
+      "today": "Rare in office LANs. Protected rings remain in metro/carrier fibre and some industrial networks.",
+      "limits": "Delay grows with ring size, and a single break stops a single ring unless a protection ring or bypass exists.",
+      "description": "Each station connects to exactly two neighbours, forming a closed loop; data travels one way.",
+      "refs": [
+        1,
+        4,
+        6
+      ],
+      "baselineScores": [
+        5,
+        5,
+        6,
+        4,
+        6,
+        5,
+        4,
+        8
+      ],
+      "justification": [
+        {
+          "text": "Closed loop of point-to-point links; each node repeats the signal",
+          "refs": [
+            1,
+            6
+          ]
+        },
+        {
+          "text": "Delay grows with the number of nodes on the ring",
+          "refs": [
+            6
+          ]
+        },
+        {
+          "text": "Moderate; adding or removing a node interrupts service",
+          "refs": [
+            6
+          ]
+        },
+        {
+          "text": "Frames pass through every intermediate station",
+          "refs": [
+            1
+          ]
+        },
+        {
+          "text": "Orderly sequential transmission, but no traffic prioritisation",
+          "refs": [
+            1
+          ]
+        },
+        {
+          "text": "One fixed path around the ring; no alternative route",
+          "refs": [
+            1
+          ]
+        },
+        {
+          "text": "A single node or link failure breaks the ring (unless dual ring)",
+          "refs": [
+            1,
+            6
+          ]
+        },
+        {
+          "text": "Only n links and no central device needed",
+          "refs": [
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "id": "token-ring",
+      "name": "Token-ring",
+      "category": "logical-mac",
+      "status": "legacy",
+      "aka": "IEEE 802.5",
+      "how": "Not a separate physical shape: IEEE 802.5 is a medium-access method. A token circulates on a logical ring, usually wired physically as a star through MSAUs; only the token holder transmits.",
+      "today": "Withdrawn IEEE standard, replaced by switched Ethernet. Included for comparison; its idea of deterministic access survives in some real-time networks.",
+      "limits": "Specialised, hard-to-source hardware; token management adds complexity. Compared here as a design option, not as an equal modern purchase.",
+      "description": "IEEE 802.5: a logical ring, physically star-wired through MSAUs; a circulating token grants access.",
+      "refs": [
+        2,
+        3,
+        5,
+        10
+      ],
+      "baselineScores": [
+        6,
+        7,
+        4,
+        5,
+        9,
+        5,
+        7,
+        5
+      ],
+      "justification": [
+        {
+          "text": "Logical ring, physically star-wired through MSAUs",
+          "refs": [
+            3,
+            10
+          ]
+        },
+        {
+          "text": "Deterministic: maximum waiting time is bounded and known",
+          "refs": [
+            3,
+            5
+          ]
+        },
+        {
+          "text": "Token management, active monitor, priorities and beaconing",
+          "refs": [
+            3
+          ]
+        },
+        {
+          "text": "Frames pass via stations; MSAU allows central control",
+          "refs": [
+            3
+          ]
+        },
+        {
+          "text": "Collision-free access; very good performance under high load",
+          "refs": [
+            5,
+            3
+          ]
+        },
+        {
+          "text": "Sequential forwarding; source routing between bridged rings",
+          "refs": [
+            3
+          ]
+        },
+        {
+          "text": "MSAU bypasses failed stations; beaconing detects faults",
+          "refs": [
+            3
+          ]
+        },
+        {
+          "text": "Specialised NICs and MSAUs; legacy, hard-to-source hardware",
+          "refs": []
+        }
+      ]
+    },
+    {
+      "id": "tree",
+      "name": "Tree",
+      "category": "physical",
+      "status": "current",
+      "aka": "Hierarchical star",
+      "how": "Star segments are connected upward to higher-level switches and a root, forming a hierarchy.",
+      "today": "The basis of hierarchical campus design (access, distribution, core layers).",
+      "limits": "Traffic between branches crosses the upper levels, and the root is a single point of failure unless duplicated.",
+      "description": "A hierarchy of star segments joined to a root/backbone; combines bus and star characteristics.",
+      "refs": [
+        1,
+        6
+      ],
+      "baselineScores": [
+        8,
+        6,
+        6,
+        6,
+        6,
+        6,
+        5,
+        6
+      ],
+      "justification": [
+        {
+          "text": "Hierarchical star segments; easy to expand branch by branch",
+          "refs": [
+            6
+          ]
+        },
+        {
+          "text": "Several hops across levels add latency at the root",
+          "refs": []
+        },
+        {
+          "text": "Manageable per segment, but more devices to configure",
+          "refs": [
+            6
+          ]
+        },
+        {
+          "text": "Segmentation allows per-branch policies; backbone is exposed",
+          "refs": []
+        },
+        {
+          "text": "Traffic converges on root and backbone links (bottleneck)",
+          "refs": []
+        },
+        {
+          "text": "Hierarchical single path up and down the tree",
+          "refs": []
+        },
+        {
+          "text": "Branch faults stay local; root or backbone failure splits network",
+          "refs": [
+            6
+          ]
+        },
+        {
+          "text": "More cabling and switches than a single star",
+          "refs": [
+            6
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mesh",
+      "name": "Mesh (partial)",
+      "category": "physical",
+      "status": "current",
+      "aka": "Partial mesh",
+      "how": "Selected nodes have several links to other nodes, so traffic has alternative paths. Path choice is made by routing or switching protocols, not by the cabling alone.",
+      "today": "Network cores, WAN backbones, data-center fabrics and wireless mesh networks.",
+      "limits": "Its reliability advantage exists only if the redundant links and devices are actually installed and configured.",
+      "description": "Critical nodes are interconnected by multiple links; other nodes connect as needed (WAN / backbone).",
+      "refs": [
+        1,
+        7
+      ],
+      "baselineScores": [
+        7,
+        8,
+        4,
+        8,
+        8,
+        9,
+        8,
+        4
+      ],
+      "justification": [
+        {
+          "text": "Critical nodes multiply connected; edge nodes linked as needed",
+          "refs": [
+            1,
+            8
+          ]
+        },
+        {
+          "text": "Short paths; traffic can take the least-delay route",
+          "refs": []
+        },
+        {
+          "text": "Needs routing protocols and many links to maintain",
+          "refs": [
+            8
+          ]
+        },
+        {
+          "text": "Point-to-point links; traffic can avoid untrusted paths",
+          "refs": [
+            7
+          ]
+        },
+        {
+          "text": "Load is spread over alternate paths",
+          "refs": [
+            7
+          ]
+        },
+        {
+          "text": "Dynamic, adaptive routing over multiple paths",
+          "refs": []
+        },
+        {
+          "text": "Redundant paths; traffic reroutes around failures",
+          "refs": [
+            8
+          ]
+        },
+        {
+          "text": "Extra links and ports raise installation cost",
+          "refs": [
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "id": "full",
+      "name": "Fully connected",
+      "category": "special-case",
+      "status": "current",
+      "specialCaseOf": "mesh",
+      "aka": "Full mesh",
+      "how": "A special case of mesh: every node has a dedicated link to every other node, which needs n(n-1)/2 links and n-1 ports per node.",
+      "today": "Practical only for a small number of critical nodes, such as a few core routers or sites; not for end devices.",
+      "limits": "Links grow quadratically: 10 nodes need 45 links, 50 nodes need 1,225.",
+      "description": "Every node has a dedicated link to every other node: n(n-1)/2 links and n-1 ports per node.",
+      "refs": [
+        1,
+        7,
+        8
+      ],
+      "baselineScores": [
+        5,
+        10,
+        2,
+        9,
+        10,
+        10,
+        10,
+        1
+      ],
+      "justification": [
+        {
+          "text": "n(n-1)/2 dedicated links; scales poorly as n grows",
+          "refs": [
+            1,
+            7,
+            8
+          ]
+        },
+        {
+          "text": "Single hop between any pair; full-duplex links",
+          "refs": [
+            8
+          ]
+        },
+        {
+          "text": "n-1 ports per node; very hard to install and maintain",
+          "refs": [
+            7,
+            8
+          ]
+        },
+        {
+          "text": "Private dedicated links; no transit through other nodes",
+          "refs": [
+            7
+          ]
+        },
+        {
+          "text": "No shared links, so no contention",
+          "refs": [
+            7,
+            8
+          ]
+        },
+        {
+          "text": "Direct path always available, plus alternates on failure",
+          "refs": [
+            8
+          ]
+        },
+        {
+          "text": "Maximum redundancy; no single point of failure",
+          "refs": [
+            8
+          ]
+        },
+        {
+          "text": "Highest cabling, port and maintenance cost",
+          "refs": [
+            8
+          ]
+        }
+      ]
+    }
+  ],
+  "references": [
+    {
+      "id": 1,
+      "type": "textbook",
+      "text": "B. A. Forouzan, Data Communications and Networking, 5th ed. New York: McGraw-Hill, 2013.",
+      "url": "https://highered.mheducation.com/sites/0073376221/information_center_view0",
+      "status": "verified",
+      "verifiedFields": [
+        "title",
+        "author",
+        "edition",
+        "publisher",
+        "url"
+      ],
+      "location": "Ch. 1 (network topologies)",
+      "pages": null,
+      "checkedOn": "2026-10-18",
+      "note": "Page numbers not verified."
+    },
+    {
+      "id": 2,
+      "type": "textbook",
+      "text": "A. S. Tanenbaum and D. J. Wetherall, Computer Networks, 5th ed. Boston: Pearson, 2011.",
+      "url": "https://www.oreilly.com/library/view/-/9780133485936/",
+      "status": "verified",
+      "verifiedFields": [
+        "title",
+        "authors",
+        "edition",
+        "publisher",
+        "url"
+      ],
+      "location": "Ch. 4 (medium access control sublayer)",
+      "pages": null,
+      "checkedOn": "2026-10-18",
+      "note": "Released September 2010 with a 2011 copyright date. Page numbers not verified."
+    },
+    {
+      "id": 3,
+      "type": "vendor-doc",
+      "text": "Cisco Systems, \"Troubleshooting Token Ring,\" Internetwork Troubleshooting Guide.",
+      "url": "https://cisco.com/en/US/docs/internetworking/troubleshooting/guide/tr1906.pdf",
+      "status": "verified",
+      "verifiedFields": [
+        "title",
+        "url",
+        "content: deterministic token passing, active monitor, beaconing, MSAU star wiring"
+      ],
+      "pages": null,
+      "checkedOn": "2026-10-18"
+    },
+    {
+      "id": 4,
+      "type": "textbook",
+      "text": "W. Stallings, Data and Computer Communications, 10th ed. Boston: Pearson, 2014.",
+      "url": "https://www.pearson.com/en-us/subject-catalog/p/data-and-computer-communications/P200000003249/9780133506488",
+      "status": "verified",
+      "verifiedFields": [
+        "title",
+        "author",
+        "edition",
+        "publisher",
+        "url"
+      ],
+      "pages": null,
+      "checkedOn": "2026-10-18",
+      "note": "General background; no specific claim relies on it alone."
+    },
+    {
+      "id": 5,
+      "type": "web",
+      "text": "IEEE TechNav, \"Token Networks.\"",
+      "url": "https://technav.ieee.org/topic/token-networks/",
+      "status": "weak",
+      "verifiedFields": [
+        "url",
+        "content: bounded access time, collision-free access"
+      ],
+      "pages": null,
+      "checkedOn": "2026-10-18",
+      "note": "Topic summary page, not a primary source. Supports claims also found in [2] and [3]."
+    },
+    {
+      "id": 6,
+      "type": "lecture-notes",
+      "text": "CSJM University, \"Network Topology\" lecture notes.",
+      "url": "https://gyansanchay.csjmu.ac.in/wp-content/uploads/2023/09/Network-Topology.pdf",
+      "status": "weak",
+      "verifiedFields": [
+        "url",
+        "content: bus/ring/star/tree/mesh advantages and disadvantages"
+      ],
+      "pages": null,
+      "checkedOn": "2026-10-18",
+      "note": "Teaching notes; secondary source."
+    },
+    {
+      "id": 7,
+      "type": "web",
+      "text": "EduRev, \"Requirements of Computer Networks.\"",
+      "url": "https://edurev.in/t/97070/Requirements-of-Computer-Networks",
+      "status": "weak",
+      "verifiedFields": [
+        "url",
+        "content: n(n-1)/2 links, n-1 ports, dedicated links avoid congestion, point-to-point privacy"
+      ],
+      "pages": null,
+      "checkedOn": "2026-10-18",
+      "note": "Study-guide site; secondary source. The same facts appear in [1]."
+    },
+    {
+      "id": 8,
+      "type": "web",
+      "text": "GeeksforGeeks, \"What is Mesh Topology?\"",
+      "url": "https://www.geeksforgeeks.org/computer-networks/advantage-and-disadvantage-of-mesh-topology/",
+      "status": "weak",
+      "verifiedFields": [
+        "url",
+        "content: N(N-1)/2 links, redundancy, cost"
+      ],
+      "pages": null,
+      "checkedOn": "2026-10-18",
+      "note": "Tutorial site; secondary source."
+    },
+    {
+      "id": 9,
+      "type": "vendor-doc",
+      "text": "Cisco Systems, Campus Wired LAN Technology Design Guide (Cisco Validated Design), Aug. 2013.",
+      "url": "https://www3-realm.cisco.com/en/US/docs/solutions/CVD/Aug2013/CVD-CampusWiredLANDesignGuide-AUG13.pdf",
+      "status": "verified",
+      "verifiedFields": [
+        "title",
+        "publisher",
+        "date",
+        "url",
+        "content: three-layer hierarchical design (access, distribution, core); dual-homed uplinks; core of two switches acting as one"
+      ],
+      "pages": "p. 5 (Hierarchical Design Model)",
+      "checkedOn": "2026-10-18",
+      "note": "Supports the hybrid (hierarchical) recommendation."
+    },
+    {
+      "id": 10,
+      "type": "standard",
+      "text": "IEEE Std 802.5, Token Ring Access Method and Physical Layer Specifications (status: inactive-withdrawn).",
+      "url": "https://standards.ieee.org/ieee/802.5/1102",
+      "status": "verified",
+      "verifiedFields": [
+        "designation",
+        "status: withdrawn",
+        "url"
+      ],
+      "pages": null,
+      "checkedOn": "2026-10-18",
+      "note": "Previously listed together with [3]; now cited separately."
+    }
+  ],
+  "limitations": [
+    "Scores are ordinal judgements on a 1-10 scale; the weighted sum treats them as if differences were equal-sized.",
+    "The weighted sum is compensatory: a strong score on one criterion can hide a weak one. Weak points are therefore listed separately.",
+    "Complexity and Cost are related, so weighting both highly partly counts the same concern twice.",
+    "Security and congestion depend heavily on switching, protocols and configuration (VLANs, QoS, access control), not on topology alone.",
+    "Baseline scores do not depend on network size; size effects are handled by explicit scenario rules, not by changing scores.",
+    "Results are educational guidance, not an engineering-validated design. Real designs need site surveys, traffic measurements and vendor specifications."
+  ]
+}
